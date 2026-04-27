@@ -1,0 +1,6 @@
+@Todos.Presentation_HostAddress = http://localhost:5288
+
+GET {{Todos.Presentation_HostAddress}}/api/todo
+Accept: application/json
+
+###
