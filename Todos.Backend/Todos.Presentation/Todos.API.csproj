@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Todos.Service\Todos.Service.csproj" />
+    <ProjectReference Include="..\Todos.Middlewares\Todos.Middlewares.csproj" />
   </ItemGroup>
 
 </Project>

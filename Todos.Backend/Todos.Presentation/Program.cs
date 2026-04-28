@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Todos.API;
 using Todos.Infrastructure;
 using Todos.Service;
+using Todos.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ErrorHandler>();
 
 app.UseCors(corsAllow);
 

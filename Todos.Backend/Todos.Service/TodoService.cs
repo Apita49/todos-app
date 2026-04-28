@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Todos.Domain;
 using Todos.Infrastructure;
+using Todos.Middlewares.Exceptions;
 
 namespace Todos.Service
 {
@@ -29,7 +30,7 @@ namespace Todos.Service
         public async Task<Todo> ToggleTodoAsync(int id)
         {
             var patchedTodo = await _context.Todos.FindAsync(id);
-            if (patchedTodo == null) return null;
+            if (patchedTodo == null) throw new TodoNotFoundException(id);
 
             patchedTodo.IsDone = !patchedTodo.IsDone;
             await _context.SaveChangesAsync();

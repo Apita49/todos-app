@@ -1,5 +1,6 @@
 ﻿using Todos.Domain;
 using Todos.Service;
+using Todos.Middlewares.Exceptions;
 
 namespace Todos.API
 {
@@ -18,14 +19,18 @@ namespace Todos.API
 
             group.MapPost("/", async (CreateTodoDto todo, ITodoService service) =>
             {
+                var errors = new Dictionary<string, string[]>();
+
                 if (string.IsNullOrWhiteSpace(todo.Title))
-                    return Results.BadRequest("Title is required");
+                    errors["Title"] = ["Title is required"];
+                else if (todo.Title.Length > 100)
+                    errors["Title"] = ["Title must not exceed 100 characters"];
 
-                if (todo.Title.Length > 100)
-                    return Results.BadRequest("Title must not exceed 100 characters");
+                if (todo.Description?.Length > 500)
+                    errors["Description"] = ["Description must not exceed 500 characters" ];
 
-                if (todo.Description.Length > 500)
-                    return Results.BadRequest("Description must not exceed 500 characters");
+                if (errors.Count > 0)
+                    throw new TodoValidationException("Validation failed", errors);
 
                 var createdTodo = await service.CreateTodoAsync(todo);
                 return Results.Created($"/api/todo/{createdTodo.Id}", createdTodo);
@@ -36,8 +41,6 @@ namespace Todos.API
             group.MapPatch("/{id}", async (int id, ITodoService service) =>
             {
                 var todo = await service.ToggleTodoAsync(id);
-                if (todo == null)
-                    return Results.NotFound();
                 return Results.Ok(todo);
             })
                 .Produces<Todo>(200)
