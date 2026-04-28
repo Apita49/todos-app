@@ -1,7 +1,9 @@
-﻿namespace Todos.Service
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Todos.Service
 {
     public record CreateTodoDto(
-        string Title,
-        string Description = ""
-        );
+        [StringLength(100)] string Title,
+        [StringLength(500)] string Description = ""
+    );
 }
