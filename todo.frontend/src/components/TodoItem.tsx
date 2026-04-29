@@ -21,10 +21,10 @@ export const TodoItem: React.FC<TodoItemProps> = ({todo, onToggle}) =>{
             >
                 <span className={todo.isDone ? 'completed' : ''}>
                     {todo.title}
+                    {todo.description && (
+                        <p className="todo-description">{todo.description}</p>
+                    )}
                 </span>
-                {todo.description && (
-                    <p className="todo-description">{todo.description}</p>
-                )}
             </label>
         </div>
     );
