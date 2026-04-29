@@ -27,7 +27,7 @@ dotnet --version  # Should show 8.0.x or higher
 
 ## Project Structure
 
-This project follows **Clean Architecture** with four separate projects:
+This project follows **Clean Architecture** with five separate projects:
 
 ```
 Todos.Backend/
@@ -51,6 +51,13 @@ Todos.Backend/
 │   ├── Todo.cs                  # Todo entity model
 │   └── Todos.Domain.csproj
 │
+├── Todos.ErrorHandler/          # Global exception handling
+│   ├── ErrorHandler.cs          # Exception handling middleware
+│   ├── Exceptions/              # Custom exception types
+│   │   ├── TodoNotFoundException.cs
+│   │   └── TodoValidationException.cs
+│   └── Todos.ErrorHandler.csproj
+│
 ├── Todos.Backend.sln            # Solution file
 ├── appsettings.json             # Base configuration
 ├── appsettings.Development.json # Development-specific config
@@ -63,6 +70,7 @@ Todos.Backend/
 - **Service**: Implements business logic and validation
 - **Infrastructure**: Manages database access via Entity Framework Core
 - **Domain**: Contains pure models (no dependencies)
+- **MiddleWare - ErrorHandler**: Provides global exception handling middleware that catches all exceptions, logs them appropriately, and returns standardized JSON error responses with proper HTTP status codes. Handles both custom exceptions (TodoNotFoundException, TodoValidationException) and unexpected errors.
 
 ## Installation & Setup
 
@@ -157,35 +165,25 @@ dotnet ef migrations list --project Todos.Infrastructure
 
 ## Project Next Steps
 
-1. **Input Validation**
-   - Add more comprehensive validation on `CreateTodoDto` (e.g., max length for Title)
-   - Return 400 Bad Request with detailed error messages for validation failures
-
-2. **Error Handling**
-   - Implement global exception handling middleware
-   - Return consistent error response format (currently returns default ASP.NET Core responses)
-   - Add try-catch blocks in service methods to handle unexpected database errors
-
-3. **Authentication/Authorization**
+1. **Authentication/Authorization**
    - Currently anyone can access the API
    - Consider adding JWT authentication for production
    - Implement per-user todo filtering
 
-4. **Logging**
-   - Current logging is minimal
-   - Add structured logging (e.g., Serilog) to track API requests and errors
-   - Useful for debugging and monitoring
+2. **Logging Enhancement**
+   - Currently using Microsoft's built-in logging facade
+   - Consider migrating to **Serilog** for more advanced features
 
-5. **Testing**
+3. **Testing**
    - Add unit tests for `TodoService`
    - Add integration tests using an in-memory database
    - Test edge cases like creating todos with empty titles
 
-6. **Database**
+4. **Database**
    - Consider PostgreSQL or SQL Server for production
    - Add connection pooling for multiple concurrent requests
    - Implement database backups
 
-7. **Documentation**
+5. **Documentation**
    - Add XML doc comments to service methods
    - Document API response codes (200, 201, 400, 404, 500)
