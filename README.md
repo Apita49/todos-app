@@ -45,6 +45,8 @@ VITE_API_URL=https://localhost:5000/api
 ├─────────────────────┤
 │   REST API Layer    │ (ASP.NET Core Minimal APIs, /api/todo endpoints)
 ├─────────────────────┤
+│  Error Handler      │ (Global exception handling middleware)
+├─────────────────────┤
 │   Service Layer     │ (Business logic, TodoService)
 ├─────────────────────┤
 │   Infrastructure    │ (Entity Framework Core with SQLite)
@@ -68,6 +70,7 @@ VITE_API_URL=https://localhost:5000/api
 
 **Backend Architecture (Clean Architecture)**
 - **Presentation**: HTTP handlers + routing (ASP.NET Core Minimal APIs)
+- **ErrorHandler**: Global exception handling middleware with standardized error responses
 - **Service**: Business logic and validation (ITodoService, TodoService)
 - **Infrastructure**: Data persistence via Entity Framework Core
 - **Domain**: Core models with no external dependencies (Todo entity)
@@ -97,11 +100,11 @@ Full schema and interactive testing available via [Swagger UI](http://localhost:
 - **Sorting**: By creation date, alphabetical order, or completion status
 
 ### Backend Infrastructure
-- **Input Validation**: Comprehensive validation on `CreateTodoDto` with detailed error responses (400 Bad Request)
-- **Error Handling**: Global exception middleware for consistent error response format
 - **Authentication/Authorization**: JWT authentication for multi-user support with per-user todo filtering
-- **Logging**: Structured logging (e.g., Serilog) for API requests and errors
+- **Logging Enhancement**: Currently using Microsoft's built-in logging facade. Consider migrating to **Serilog** for advanced features (multiple sinks, enhanced enrichment, flexible configuration, community extensions)
 - **Testing**: Unit tests for `TodoService`, integration tests with in-memory database
+- **Database Scaling**: PostgreSQL or SQL Server for production with connection pooling and backups
+- **API Documentation**: XML doc comments on service methods, comprehensive response code documentation
 
 ### Frontend UX & Quality
 - **Offline Support**: Persist todos locally via localStorage as fallback
@@ -111,9 +114,10 @@ Full schema and interactive testing available via [Swagger UI](http://localhost:
 - **Responsive Design**: Mobile-friendly layout with touch interactions
 - **Advanced Features**: Drag-and-drop reordering, WebSocket real-time sync, state management upgrade (Context/Redux)
 
-### Database & Deployment
-- **Database Scaling**: PostgreSQL or SQL Server for production with connection pooling and backups
-- **API Documentation**: XML doc comments on service methods, standardized response codes (200, 201, 400, 404, 500)
+### Deployment
+- **Containerization**: Docker support for consistent development and production environments
+- **CI/CD Pipeline**: Automated build and deployment workflows
+- **Monitoring**: Application performance monitoring and error tracking
 
 ---
 
@@ -131,6 +135,7 @@ todos-app/
 │
 ├── Todos.Backend/              # ASP.NET Core 8.0 backend
 │   ├── Todos.Presentation/     # API layer (Minimal APIs)
+│   ├── Todos.ErrorHandler/     # Global exception handling
 │   ├── Todos.Service/          # Business logic
 │   ├── Todos.Infrastructure/   # Data access (EF Core)
 │   ├── Todos.Domain/           # Core models
