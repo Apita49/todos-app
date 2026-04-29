@@ -28,24 +28,28 @@ export const TodoForm : React.FC<TodoFormProps> = ({ onSubmit }) => {
     }
     return (
         <form onSubmit={handleSubmit} className="todo-form">
-            <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Todo Title"
-            required
-            disabled={isSubmitting}
-            />
-            <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Description (Optional)"
-            disabled={isSubmitting}
-            />
-            <button type="submit" disabled={isSubmitting}>
-                {isSubmitting? 'Creating...' : 'Add Task'}
-            </button>
+            <div className="todo-form-row">
+                <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Todo Title"
+                required
+                disabled={isSubmitting}
+                />
+                <button type="submit" disabled={isSubmitting}>
+                    {isSubmitting? 'Creating...' : 'Add Task'}
+                </button>
+            </div>
+            <div className="todo-form-row">
+                <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Description (Optional)"
+                disabled={isSubmitting}
+                className="todo-form-description"
+                />
+            </div>
         </form>
     );
 };
