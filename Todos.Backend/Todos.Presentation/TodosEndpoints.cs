@@ -1,4 +1,5 @@
-﻿using Todos.Domain;
+﻿using Microsoft.Extensions.Logging;
+using Todos.Domain;
 using Todos.Service;
 using Todos.Middlewares.Exceptions;
 
@@ -10,14 +11,15 @@ namespace Todos.API
         {
             var group = app.MapGroup("/api/todo");
 
-            group.MapGet("/", async (ITodoService service) =>
+            group.MapGet("/", async (ITodoService service, ILogger<Program> logger) =>
             {
                 var todos = await service.GetTodosAsync();
+                logger.LogInformation("GET /api/todo - Returning {Count} todos", ((List<Todo>)todos).Count);
                 return Results.Ok(todos);
             })
                 .Produces<IEnumerable<Todo>>();
 
-            group.MapPost("/", async (CreateTodoDto todo, ITodoService service) =>
+            group.MapPost("/", async (CreateTodoDto todo, ITodoService service, ILogger<Program> logger) =>
             {
                 var errors = new Dictionary<string, string[]>();
 
@@ -30,17 +32,22 @@ namespace Todos.API
                     errors["Description"] = ["Description must not exceed 500 characters" ];
 
                 if (errors.Count > 0)
+                {
+                    logger.LogWarning("POST /api/todo - Validation failed: {@ValidationErrors}", errors);
                     throw new TodoValidationException("Validation failed", errors);
+                }
 
                 var createdTodo = await service.CreateTodoAsync(todo);
+                logger.LogInformation("POST /api/todo - Todo created, Response: 201");
                 return Results.Created($"/api/todo/{createdTodo.Id}", createdTodo);
             })
                 .Produces<Todo>(200)
                 .Produces(400);
 
-            group.MapPatch("/{id}", async (int id, ITodoService service) =>
+            group.MapPatch("/{id}", async (int id, ITodoService service, ILogger<Program> logger) =>
             {
                 var todo = await service.ToggleTodoAsync(id);
+                logger.LogInformation("PATCH /api/todo/{TodoId} - Todo toggled successfully", id);
                 return Results.Ok(todo);
             })
                 .Produces<Todo>(200)
