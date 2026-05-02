@@ -42,30 +42,30 @@ public class ErrorHandler
             case TodoNotFoundException notFoundEx:
                 statusCode = StatusCodes.Status404NotFound;
                 logger.LogInformation("Todo not found: {Message}", notFoundEx.Message);
-                response = new { message = notFoundEx.Message, statusCode = 404 };
+                response = new { message = notFoundEx.Message };
                 break;
 
             case TodoValidationException validationEx:
                 statusCode = StatusCodes.Status400BadRequest;
                 logger.LogWarning("Validation error: {@Errors}", validationEx.Errors);
-                response = new { message = validationEx.Message, errors = validationEx.Errors, statusCode = 400 };
+                response = new { message = validationEx.Message, errors = validationEx.Errors };
                 break;
 
             case SqliteException dbEx:
                 statusCode = StatusCodes.Status500InternalServerError;
                 logger.LogError(dbEx, "Database error occurred");
-                response = new { message = "A database error occurred", statusCode = 500 };
+                response = new { message = "A database error occurred" };
                 break;
 
             case Exception ex:
                 statusCode = StatusCodes.Status500InternalServerError;
                 logger.LogError(ex, "Unhandled exception occurred");
-                response = new { message = "An unexpected error occurred", statusCode = 500 };
+                response = new { message = "An unexpected error occurred" };
                 break;
 
             default:
                 statusCode = StatusCodes.Status500InternalServerError;
-                response = new { message = "An unexpected error occurred", statusCode = 500 };
+                response = new { message = "An unexpected error occurred" };
                 break;
         }
 
