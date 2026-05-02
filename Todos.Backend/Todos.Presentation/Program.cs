@@ -4,45 +4,64 @@ using Todos.Infrastructure;
 using Todos.Service;
 using Todos.Middlewares;
 
-var builder = WebApplication.CreateBuilder(args);
-
-var corsAllow = "AllowFrontend";
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
-builder.Services.AddCors(options =>
+public class Program
 {
-    options.AddPolicy(name: corsAllow, policy =>
+    public static void Main(string[] args)
     {
-        policy.WithOrigins(allowedOrigins)
-        .AllowAnyHeader()
-        .AllowAnyMethod();
-    });
-});
+        var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+        var corsAllow = "AllowFrontend";
+        var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
-builder.Services.AddScoped<ITodoService, TodoService>();
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(name: corsAllow, policy =>
+            {
+                if (allowedOrigins != null && allowedOrigins.Length > 0)
+                {
+                    policy.WithOrigins(allowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                }
+                else
+                {
+                    policy.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                }
+            });
+        });
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 
-var app = builder.Build();
+        builder.Services.AddScoped<ITodoService, TodoService>();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+        // Add services to the container.
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        if (!app.Environment.IsEnvironment("Testing"))
+        {
+            app.UseHttpsRedirection();
+        }
+
+        app.UseMiddleware<ErrorHandler>();
+
+        app.UseCors(corsAllow);
+
+        app.MapTodosEndpoint();
+
+        app.Run();
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseMiddleware<ErrorHandler>();
-
-app.UseCors(corsAllow);
-
-app.MapTodosEndpoint();
-
-app.Run();
