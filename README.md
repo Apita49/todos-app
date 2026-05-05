@@ -39,9 +39,11 @@ VITE_API_URL=https://localhost:5000/api
 ┌─────────────────────┐
 │   React Components  │ (TodoForm, TodoList, TodoItem)
 ├─────────────────────┤
-│   useTodos Hook     │ (State management, loading, errors)
+│   ErrorContext      │ (Global error state & modal UI)
 ├─────────────────────┤
-│   todoService       │ (Axios client with typed requests/responses)
+│   useTodos Hook     │ (State management, loading, error routing)
+├─────────────────────┤
+│   todoService       │ (Axios client with typed requests/responses and error interceptor)
 ├─────────────────────┤
 │   REST API Layer    │ (ASP.NET Core Minimal APIs, /api/todo endpoints)
 ├─────────────────────┤
@@ -64,8 +66,9 @@ VITE_API_URL=https://localhost:5000/api
 
 **Frontend Architecture**
 - **Components**: Presentational logic only (TodoForm, TodoList, TodoItem)
-- **Hooks**: State management via `useTodos` encapsulates API calls and loading states
-- **Services**: Centralized Axios client for all API communication
+- **Error Handling**: Global context (`ErrorContext`) with modal UI for API errors and inline field validation errors.
+- **Hooks**: State management via `useTodos` encapsulates API calls, loading states, and error routing
+- **Services**: Centralized Axios client with error interceptor for categorizing validation vs API errors
 - **Types**: Shared interfaces ensure consistency with backend responses
 
 **Backend Architecture (Clean Architecture)**
@@ -141,6 +144,7 @@ todos-app/
 ├── todo.frontend/              # React TypeScript frontend
 │   ├── src/
 │   │   ├── components/         # TodoForm, TodoList, TodoItem
+│   │   ├── context/            # ErrorContext
 │   │   ├── hooks/              # useTodos hook
 │   │   ├── services/           # todoService (Axios client)
 │   │   └── types/              # TypeScript interfaces
