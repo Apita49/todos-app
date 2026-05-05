@@ -45,7 +45,7 @@ VITE_API_URL=https://localhost:5000/api
 ├─────────────────────┤
 │   REST API Layer    │ (ASP.NET Core Minimal APIs, /api/todo endpoints)
 ├─────────────────────┤
-│  Error Handler      │ (Global exception handling middleware)
+│   Error Handler     │ (Global exception handling middleware)
 ├─────────────────────┤
 │   Service Layer     │ (Business logic, TodoService)
 ├─────────────────────┤
@@ -91,6 +91,20 @@ Full schema and interactive testing available via [Swagger UI](http://localhost:
 
 ---
 
+### Backend Testing
+
+The backend includes comprehensive test coverage:
+
+- **Framework**: NUnit with Moq for unit and integration testing
+- **Coverage**: Service layer, REST API endpoints, and error handling middleware
+- **Test Categories**:
+  - Service Tests: Unit tests with mocked database
+  - Integration Tests: Full API endpoint testing with WebApplicationFactory
+  - Error Handler Tests: Global exception handling validation
+- **Run Tests**: `dotnet test` from the Todos.Backend directory
+
+See [Todos.Backend/README.md](Todos.Backend/README.md#testing) for detailed testing framework documentation and examples.
+
 ## Future Enhancements
 
 ### Core Features
@@ -102,7 +116,6 @@ Full schema and interactive testing available via [Swagger UI](http://localhost:
 ### Backend Infrastructure
 - **Authentication/Authorization**: JWT authentication for multi-user support with per-user todo filtering
 - **Logging Enhancement**: Currently using Microsoft's built-in logging facade. Consider migrating to **Serilog** for advanced features (multiple sinks, enhanced enrichment, flexible configuration, community extensions)
-- **Testing**: Unit tests for `TodoService`, integration tests with in-memory database
 - **Database Scaling**: PostgreSQL or SQL Server for production with connection pooling and backups
 - **API Documentation**: XML doc comments on service methods, comprehensive response code documentation
 
@@ -139,6 +152,7 @@ todos-app/
 │   ├── Todos.Service/          # Business logic
 │   ├── Todos.Infrastructure/   # Data access (EF Core)
 │   ├── Todos.Domain/           # Core models
+│   ├── Todos.Test/             # Endoint, Service and Error handling Tests
 │   └── README.md               # Backend-specific documentation
 │
 └── README.md                   # This file
