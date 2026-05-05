@@ -24,7 +24,7 @@ This application provides a simple yet structured interface for managing todos. 
 - Create todos with title and optional description
 - Toggle todos between incomplete and complete states
 - View all todos with their current status
-- Real-time error handling and loading state management
+- Global error handling with validation and API error distinction
 
 ---
 
@@ -39,14 +39,18 @@ src/
 ├── main.tsx                   # Entry point
 ├── index.css                  # Global styles
 ├── components/
+│   ├── ErrorModal.tsx         # Modal component for displaying generic errors
 │   ├── TodoForm.tsx           # Form for creating new todos
 │   ├── TodoItem.tsx           # Individual todo display with toggle
 │   └── TodoList.tsx           # Container for todo items
+├── context/
+│   └── ErrorContext.tsx       # Global error state management
 ├── hooks/
 │   └── useTodos.ts            # Custom hook for todo state management
 ├── services/
 │   └── todoService.ts         # Axios client for API communication
 └── types/
+    ├── errors.ts              # Error type definitions
     └── todo.ts                # TypeScript interfaces and types
 ```
 
@@ -55,9 +59,9 @@ src/
 ```
 Components (TodoForm, TodoList) 
     ↓
-useTodos Hook (state management)
+useTodos Hook (state management + error handling)
     ↓
-todoService (API client with Axios)
+todoService (API client with Axios + error interceptor)
     ↓
 .NET Backend API
 ```
@@ -72,6 +76,34 @@ todoService (API client with Axios)
 - `Todo`: Represents a complete todo item with id, title, optional description, and completion status
 - `CreateTodoDto`: Data transfer object for creating new todos
 - Component prop interfaces ensure type-safe component communication
+
+### Error Handling Architecture
+
+The application implements a two-tier error handling system that distinguishes between validation errors and API errors:
+
+**Error Context** (`ErrorContext.tsx`)
+- Global state management for all errors across the application
+- Tracks two error types:
+  - `fieldErrors`: Validation errors mapped to specific form fields (field name → error messages)
+  - `modalError`: Generic API error messages displayed in a modal overlay
+
+**Validation Errors (400 status codes)**
+- Captured from API responses with field-level error mappings
+- Displayed inline under problematic form fields with red styling
+- Automatically cleared when the user interacts with the field
+- Example: "Title must be less than 100 characters" appears below the title input
+
+**API Errors (other failures)**
+- Displayed in a modal overlay with a generic error message
+- Provides a clear user-facing fallback for unexpected server failures
+- Logged for debugging purposes
+- Dismissed by clicking the modal overlay or the "Ok" button
+
+**Error Flow**
+1. API service detects errors and categorizes them using TypeScript discriminated unions
+2. Error handler in `useTodos` hook routes errors to appropriate context setters
+3. Components subscribe to `ErrorContext` and render errors accordingly
+4. Form fields display validation errors inline; the modal displays API errors globally
 
 ---
 
@@ -157,5 +189,4 @@ Potential improvements and feature additions for future iterations:
 ### Testing & Quality
 - **Unit tests with Vitest** - Test components and hooks in isolation
 - **E2E tests with Playwright/Cypress** - Test complete user workflows
-- **Error boundary implementation** - Gracefully handle and display component errors
 - **API error handling improvements** - Add retry logic and rate limiting awareness
