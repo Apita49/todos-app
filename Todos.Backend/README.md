@@ -58,6 +58,12 @@ Todos.Backend/
 │   │   └── TodoValidationException.cs
 │   └── Todos.ErrorHandler.csproj
 │
+├── Todos.Test/                  # Unit, integration, and error handler tests
+│   ├── Service/                 # Service layer tests with mocked database
+│   ├── Endpoints/               # API endpoint integration tests
+│   ├── Middleware/              # Error handler middleware tests
+│   └── Todos.Test.csproj
+│
 ├── Todos.Backend.sln            # Solution file
 ├── appsettings.json             # Base configuration
 ├── appsettings.Development.json # Development-specific config
@@ -163,6 +169,48 @@ dotnet ef migrations list --project Todos.Infrastructure
 # The initial migration "InitialCreate" creates the Todos table
 ```
 
+## Testing
+
+The backend includes comprehensive test coverage using **NUnit** and **Moq**:
+
+### Test Framework
+
+- **NUnit 3.14** - Unit testing framework with fluent assertion syntax
+- **Moq 4.20** - Mocking library for isolating dependencies
+- **Microsoft.AspNetCore.Mvc.Testing** - Integration testing utilities for WebApplicationFactory
+- **Entity Framework Core InMemory** - In-memory database provider for unit tests
+- **NUnit3TestAdapter** - Test adapter for Visual Studio and command-line test runners
+
+### Test Categories
+
+1. **Service Tests** (`Todos.Test/Service/TodoServiceTests.cs`)
+   - Unit tests for TodoService with mocked database
+   - Tests CRUD operations, business logic, and error scenarios
+   - Uses in-memory database for isolated service layer testing
+
+2. **Integration Tests** (`Todos.Test/Endpoints/TodosEndpointsTests.cs`)
+   - Tests all REST API endpoints (GET, POST, PATCH)
+   - Uses WebApplicationFactory for full application context testing
+   - Validates input validation, response formats, and error handling
+
+3. **Error Handler Tests** (`Todos.Test/Middleware/ErrorHandlerTests.cs`)
+   - Tests global exception handling middleware
+   - Validates correct HTTP status codes and error response formats
+   - Tests custom exceptions (TodoNotFoundException, TodoValidationException)
+
+### Running Tests
+
+```bash
+# Run all tests
+dotnet test
+
+# Run specific test class
+dotnet test --filter Todos.Test.Service.TodoServiceTests
+
+# Run with test output
+dotnet test --logger "console;verbosity=detailed"
+```
+
 ## Project Next Steps
 
 1. **Authentication/Authorization**
@@ -174,16 +222,12 @@ dotnet ef migrations list --project Todos.Infrastructure
    - Currently using Microsoft's built-in logging facade
    - Consider migrating to **Serilog** for more advanced features
 
-3. **Testing**
-   - Add unit tests for `TodoService`
-   - Add integration tests using an in-memory database
-   - Test edge cases like creating todos with empty titles
-
-4. **Database**
+3. **Database**
    - Consider PostgreSQL or SQL Server for production
    - Add connection pooling for multiple concurrent requests
    - Implement database backups
 
-5. **Documentation**
+4. **Documentation**
    - Add XML doc comments to service methods
    - Document API response codes (200, 201, 400, 404, 500)
+ 
