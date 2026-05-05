@@ -1,0 +1,35 @@
+.todo-form-row {
+  align-items: flex-start;
+}
+
+.todo-form-row button {
+  align-self: flex-start;
+  margin-top: 0;
+}
+
+.todo-form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-form-field input,
+.todo-form-field textarea {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.todo-form-field input.input-error,
+.todo-form-field textarea.input-error {
+  border-color: #d32f2f;
+  background-color: #ffebee;
+}
+
+.field-error {
+  color: #d32f2f;
+  font-size: 12px;
+  margin-top: 4px;
+  line-height: 1.4;
+}

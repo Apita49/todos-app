@@ -1,15 +1,14 @@
 import {TodoForm} from "./components/TodoForm";
 import {TodoList} from "./components/TodoList";
 import {useTodos} from "./hooks/useTodos"
+import { ErrorProvider } from "./context/ErrorContext";
+import { ErrorModal } from "./components/ErrorModal";
 import './App.css';
 
-function App() {
-  const {todos, loading, error, addTodo, toggleTodo} = useTodos();
+function AppContent() {
+  const {todos, loading, addTodo, toggleTodo} = useTodos();
   if(loading){
     return <div className="loading">Loading...</div>;
-  }
-  if (error){
-    return <div className="error">Error: {error}</div>;
   }
   return (
     <div className="app">
@@ -22,6 +21,15 @@ function App() {
       </main>
     </div>
   );
-};
+}
+
+function App() {
+  return (
+    <ErrorProvider>
+      <AppContent />
+      <ErrorModal />
+    </ErrorProvider>
+  );
+}
 
 export default App;

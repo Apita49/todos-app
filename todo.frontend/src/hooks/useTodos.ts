@@ -1,11 +1,12 @@
 import {useState, useEffect} from 'react';
 import todoService from '../services/todoService.ts';
+import { useError } from '../context/ErrorContext';
 import type {Todo, CreateTodoDto} from "../types/todo.ts";
+import { isValidationError, isApiError } from '../types/errors';
 
 interface UseTodosReturn{
     todos : Todo[];
     loading : boolean;
-    error : string | null;
     addTodo : (data : CreateTodoDto) => Promise<Todo>;
     toggleTodo : (id : number) => Promise<void>;
     refreshTodos : () => Promise<void>
@@ -14,22 +15,30 @@ interface UseTodosReturn{
 export const useTodos = () : UseTodosReturn =>{
     const [todos, setTodos] = useState<Todo[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string|null>(null);
+    const { setModalError, setFieldErrors } = useError();
 
     useEffect(()=>{
         loadTodos();
     },[])
+
+    const handleError = (err: unknown) => {
+        if (isValidationError(err)) {
+            setFieldErrors(err.errors);
+        } else if (isApiError(err)) {
+            setModalError(err.message);
+        } else {
+            setModalError('An error occurred');
+        }
+    };
 
     const loadTodos = async() : Promise<void> =>{
         try {
             setLoading(true);
             const data = await todoService.getTodos();
             setTodos(data);
-            setError(null)
         } catch (err){
-            const message = err instanceof Error ? err.message : "Unkown error";
-            setError(message);
-            console.error("Error loading", err)
+            handleError(err);
+            console.error("Error loading todos", err)
         } finally{
             setLoading(false)
         }
@@ -39,10 +48,10 @@ export const useTodos = () : UseTodosReturn =>{
         try {
             const newTodo = await todoService.createTodo(data);
             setTodos(prev => [...prev, newTodo]);
+            setFieldErrors({});
             return newTodo;
         } catch(err) {
-            const message = err instanceof Error ? err.message : "Unkown error";
-            setError(message);
+            handleError(err);
             throw err;
         }
     }
@@ -52,16 +61,14 @@ export const useTodos = () : UseTodosReturn =>{
             const updatedTodo = await todoService.toggleTodo(id);
             setTodos(prev => prev.map(todo => todo.id === id ? updatedTodo : todo));
         } catch (err) {
-            const message = err instanceof Error ? err.message : "Unkown error";
-            setError(message);
-            throw err;            
+            handleError(err);
+            throw err;
         }
     }
 
     return {
         todos,
         loading,
-        error,
         addTodo,
         toggleTodo,
         refreshTodos:loadTodos,
